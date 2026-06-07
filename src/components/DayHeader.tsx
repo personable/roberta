@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { ChevronLeft, ChevronRight, MoreHorizontal, ListPlus, Trash2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import ColorBox from './ColorBox';
 import type { DayType } from '../types';
@@ -26,8 +27,11 @@ interface DayHeaderProps {
   selectedDayIndex: number;
   getDayType: (dayIndex: number) => DayType;
   onSelectDay: (dayIndex: number) => void;
+  onSetDayType: (dayIndex: number, type: DayType) => void;
   onPrevWeek: () => void;
   onNextWeek: () => void;
+  onAddToAllBlocks: (dayIndex: number) => void;
+  onClearAllBlocks: (dayIndex: number) => void;
 }
 
 export default function DayHeader({
@@ -35,8 +39,11 @@ export default function DayHeader({
   selectedDayIndex,
   getDayType,
   onSelectDay,
+  onSetDayType,
   onPrevWeek,
   onNextWeek,
+  onAddToAllBlocks,
+  onClearAllBlocks,
 }: DayHeaderProps) {
   const monday = new Date(weekStart + 'T00:00:00');
   const friday = new Date(monday);
@@ -86,18 +93,76 @@ export default function DayHeader({
         return (
           <div key={i} className="flex-1 flex flex-col border-r border-slate-100 last:border-r-0">
 
-            {/* Day-type label — not yet wired up */}
-            <button
-              className={cn(
-                'flex items-center gap-2 px-5 py-4 border-b border-slate-100 w-full text-left transition-colors hover:bg-slate-50'
-              )}
-              aria-label={`${isRed ? 'Red' : 'White'} day — click to change`}
-            >
-              <ColorBox size={18} color={isRed ? 'red' : 'slate'} />
-              <span className="text-xs tracking-widest uppercase text-slate-600">
-                {isRed ? 'Red Day' : 'White Day'}
-              </span>
-            </button>
+            <div className="flex transition-colors hover:bg-slate-50 border-b border-slate-100">
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  className="flex items-center gap-2 px-5 py-4 w-full text-left hover:opacity-75 transition-opacity focus:outline-none"
+                  aria-label={`${isRed ? 'Red' : 'White'} day — click to change`}
+                >
+                  <ColorBox size={18} color={isRed ? 'red' : 'white'} />
+                  <span className="text-xs tracking-wide uppercase text-slate-600">
+                    {isRed ? 'Red Day' : 'White Day'}
+                  </span>
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  side="bottom"
+                  align="start"
+                  sideOffset={4}
+                  className="bg-white border border-slate-100 rounded-xl shadow-lg py-2 min-w-[160px] z-50 animate-in fade-in-0 zoom-in-95 duration-100 origin-top-left"
+                >
+                  {(['red', 'white'] as DayType[]).map((t) => (
+                    <DropdownMenu.Item
+                      key={t}
+                      onSelect={() => onSetDayType(i, t)}
+                      className={cn(
+                        'flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 cursor-default select-none outline-none data-[highlighted]:bg-slate-50',
+                        dayType === t && 'font-medium',
+                      )}
+                    >
+                      <ColorBox size={18} color={t === 'red' ? 'red' : 'white'} />
+                      {t === 'red' ? 'Red Day' : 'White Day'}
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+            <DropdownMenu.Root onOpenChange={(open) => { if (open) onSelectDay(i); }}>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  aria-label="Day options"
+                  className="px-3 flex items-center text-slate-500 hover:text-slate-800 transition-colors focus:outline-none"
+                >
+                  <MoreHorizontal size={16} />
+                </button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  side="bottom"
+                  align="end"
+                  sideOffset={-4}
+                  className="bg-white border border-slate-100 rounded-xl shadow-lg py-2 min-w-[210px] z-50 animate-in fade-in-0 zoom-in-95 duration-100 origin-top-right"
+                >
+                  <DropdownMenu.Item
+                    onSelect={() => onAddToAllBlocks(i)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 cursor-pointer select-none outline-none data-[highlighted]:bg-slate-50"
+                  >
+                    <ListPlus size={16} className="text-slate-600 shrink-0" />
+                    Add All-Day Item
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onSelect={() => onClearAllBlocks(i)}
+                    className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-700 cursor-pointer select-none outline-none data-[highlighted]:bg-slate-50"
+                  >
+                    <Trash2 size={16} className="text-slate-600 shrink-0" />
+                    Clear Whole Day
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+            </div>
 
             {/* Day select button */}
             <button

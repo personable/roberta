@@ -11,6 +11,7 @@ import type { Block, ScheduleItem, ClassItemType } from '../types';
 interface BlockContentProps {
   block: Block;
   items: ScheduleItem[];
+  isActive?: boolean;
   onItemClick: (item: ScheduleItem) => void;
   onDeleteAll: () => void;
   onDeleteItem: (id: string) => void;
@@ -18,18 +19,26 @@ interface BlockContentProps {
   onDeleteClassSubItem: (classItemId: string, subItemId: string) => void;
 }
 
-export default function BlockContent({ block, items, onItemClick, onDeleteAll, onDeleteItem, onAddClassSubItem, onDeleteClassSubItem }: BlockContentProps) {
+export default function BlockContent({ block, items, isActive, onItemClick, onDeleteAll, onDeleteItem, onAddClassSubItem, onDeleteClassSubItem }: BlockContentProps) {
   // Stays false during the first render so pre-existing items skip the entrance animation.
   // Flips to true after mount so any subsequently added item animates in normally.
   const hasMounted = useRef(false);
   useEffect(() => { hasMounted.current = true; }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 bg-slate-50 border-b border-slate-200">
+    <div className="p-8">
       {/* Block heading */}
       <div className="flex items-baseline justify-between mb-6">
-        <div className="flex items-baseline gap-4">
-          <h2 className="font-display text-3xl text-slate-800 font-extrabold">{block.name}</h2>
+        <div
+          className={cn(
+            'flex items-baseline gap-4 transition-all duration-300 origin-left',
+            isActive ? 'scale-[1.2]' : 'scale-100',
+          )}
+        >
+          <h2 className={cn(
+            'font-display text-3xl font-extrabold ',
+            isActive ? 'color-slate-800' : 'color-slate-600',
+          )}>{block.name}</h2>
           {block.time && (
             <span className="text-sm text-slate-400">{block.time}</span>
           )}
@@ -37,7 +46,7 @@ export default function BlockContent({ block, items, onItemClick, onDeleteAll, o
         {items.length > 0 && (
           <Button variant="outline" size="sm" onClick={onDeleteAll}>
             <Trash2 size={16} />
-            Delete All
+            Clear Block
           </Button>
         )}
       </div>
@@ -62,13 +71,14 @@ export default function BlockContent({ block, items, onItemClick, onDeleteAll, o
                 {item.type === 'class' ? (
                   <ClassItemCard
                     item={item}
+                    onClick={() => onItemClick(item)}
                     onDelete={() => onDeleteItem(item.id)}
                     onAddSubItem={(title, type) => onAddClassSubItem(item.id, title, type)}
                     onDeleteSubItem={(subItemId) => onDeleteClassSubItem(item.id, subItemId)}
                   />
                 ) : (
                   <div className={cn(
-                    'flex items-stretch rounded-xl border border-slate-200',
+                    'group flex items-stretch rounded-xl border border-slate-200',
                     'bg-white transition-colors hover:border-slate-400',
                   )}>
                     {/* Main clickable area — opens drawer */}
@@ -91,7 +101,7 @@ export default function BlockContent({ block, items, onItemClick, onDeleteAll, o
                     <button
                       onClick={() => onDeleteItem(item.id)}
                       aria-label={`Delete "${item.title}"`}
-                      className="flex items-center px-4 text-slate-600 hover:text-slate-800 transition-colors rounded-r-xl"
+                      className="flex items-center px-4 text-slate-600 hover:text-slate-800 transition-all rounded-r-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
                     >
                       <Trash2 size={18} />
                     </button>

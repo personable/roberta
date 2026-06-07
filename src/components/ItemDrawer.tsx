@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { ITEM_TYPE_CONFIGS } from '../lib/itemTypes';
+import { Button } from './Button';
 import ColorBox from './ColorBox';
 import type { ItemType, ScheduleItem } from '../types';
 
@@ -13,6 +14,8 @@ interface ItemDrawerProps {
   onClose: () => void;
   onSave: (updated: ScheduleItem) => void;
   onDelete: (id: string) => void;
+  /** When provided the drawer opens in create-mode: empty fields, Done adds to all blocks. */
+  onAddToAll?: (title: string, type: ItemType, description?: string) => void;
 }
 
 export default function ItemDrawer({
@@ -21,21 +24,28 @@ export default function ItemDrawer({
   onClose,
   onSave,
   onDelete,
+  onAddToAll,
 }: ItemDrawerProps) {
+  const isCreateMode = !!onAddToAll;
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<ItemType>('reminder');
 
   useEffect(() => {
-    if (item) {
+    if (open && isCreateMode) {
+      setTitle('');
+      setDescription('');
+      setType('reminder');
+    } else if (item) {
       setTitle(item.title);
       setDescription(item.description ?? '');
       setType(item.type);
     }
-  }, [item]);
+  }, [open, item, isCreateMode]);
 
   function handleSave() {
-    if (!item) return;
+    if (!item || isCreateMode) return;
     onSave({ ...item, title, description: description || undefined, type });
   }
 
@@ -44,9 +54,21 @@ export default function ItemDrawer({
     onDelete(item.id);
   }
 
+  function handleAddToAll() {
+    if (!title.trim()) return;
+    onAddToAll!(title.trim(), type, description || undefined);
+    onClose();
+  }
+
+  function handleOpenChange(o: boolean) {
+    if (!o) {
+      if (!isCreateMode) handleSave();
+      onClose();
+    }
+  }
+
   return (
-    <Dialog.Root open={open} onOpenChange={(o) => { if (!o) { handleSave(); onClose(); } }}>
-      {/* forceMount keeps the portal in the DOM so AnimatePresence can play the exit animation */}
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal forceMount>
         <AnimatePresence>
           {open && (
@@ -73,7 +95,9 @@ export default function ItemDrawer({
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between p-4 border-b border-slate-100">
-                    <Dialog.Title className="font-semibold text-slate-800 text-md font-display">Edit Item</Dialog.Title>
+                    <Dialog.Title className="font-semibold text-slate-800 text-md font-display">
+                      {isCreateMode ? 'Add to All Blocks' : 'Edit Item'}
+                    </Dialog.Title>
                     <Dialog.Close asChild>
                       <button
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
@@ -85,13 +109,13 @@ export default function ItemDrawer({
                   </div>
 
                   {/* Body */}
-                  <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
+                  <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-5">
                     {/* Type selector */}
                     <div>
                       <label className="text-xs font-medium text-slate-500 uppercase tracking-wide block mb-2">
                         Type
                       </label>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         {ITEM_TYPE_CONFIGS.map((c) => (
                           <button
                             key={c.type}
@@ -99,9 +123,7 @@ export default function ItemDrawer({
                             title={c.label}
                             className={cn(
                               'transition-all rounded-xl focus:outline-none',
-                              type === c.type
-                                ? 'scale-110'
-                                : 'opacity-50 hover:opacity-100',
+                              type === c.type ? 'scale-110' : 'opacity-50 hover:opacity-100',
                             )}
                           >
                             <ColorBox size={32} color={c.color} iconName={c.iconName} />
@@ -119,9 +141,10 @@ export default function ItemDrawer({
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        onBlur={handleSave}
+                        onBlur={isCreateMode ? undefined : handleSave}
                         className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300"
                         placeholder="Item title"
+                        autoFocus={isCreateMode}
                       />
                     </div>
 
@@ -133,24 +156,33 @@ export default function ItemDrawer({
                       <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        onBlur={handleSave}
+                        onBlur={isCreateMode ? undefined : handleSave}
                         rows={4}
                         className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300 resize-none"
                         placeholder="Optional notes..."
                       />
                     </div>
+
+                    {/* Done button — create mode only */}
+                    {isCreateMode && (
+                      <Button onClick={handleAddToAll} disabled={!title.trim()}>
+                        Done
+                      </Button>
+                    )}
                   </div>
 
-                  {/* Footer */}
-                  <div className="px-4 py-3 border-t border-slate-200">
-                    <button
-                      onClick={handleDelete}
-                      className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-red-600 hover:bg-red-50 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                      Delete item
-                    </button>
-                  </div>
+                  {/* Footer — edit mode only */}
+                  {!isCreateMode && (
+                    <div className="px-4 py-3 border-t border-slate-100">
+                      <button
+                        onClick={handleDelete}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                        Delete Item
+                      </button>
+                    </div>
+                  )}
                 </motion.div>
               </Dialog.Content>
             </>

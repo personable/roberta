@@ -1,4 +1,4 @@
-export type ItemType = 'reminder' | 'prep' | 'meeting' | 'personal' | 'class';
+export type ItemType = 'reminder' | 'prep' | 'meeting' | 'personal' | 'class' | 'testing';
 
 export type ClassItemType = 'bell-work' | 'announcement' | 'reminder' | 'lesson' | 'wrap-up' | 'other';
 

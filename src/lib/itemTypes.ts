@@ -16,7 +16,7 @@ export const ITEM_TYPE_CONFIGS: ItemTypeConfig[] = [
     type: 'reminder',
     label: 'Reminder',
     color: 'yellow',
-    iconName: 'Bell',
+    iconName: 'AlarmClock',
     cardBg: 'bg-yellow-50',
     borderColor: 'border-yellow-400',
   },
@@ -52,6 +52,14 @@ export const ITEM_TYPE_CONFIGS: ItemTypeConfig[] = [
     cardBg: 'bg-teal-50',
     borderColor: 'border-teal-400',
   },
+  {
+    type: 'testing',
+    label: 'Testing',
+    color: 'orange',
+    iconName: 'ClipboardCheck',
+    cardBg: 'bg-orange-50',
+    borderColor: 'border-orange-400',
+  },
 ];
 
 export function getItemTypeConfig(type: ItemType): ItemTypeConfig {
@@ -62,15 +70,16 @@ export interface ClassItemTypeConfig {
   type: ClassItemType;
   label: string;
   iconName: string;
+  color: BoxColor;
 }
 
 export const CLASS_ITEM_TYPE_CONFIGS: ClassItemTypeConfig[] = [
-  { type: 'bell-work',     label: 'Bell Work',     iconName: 'Bell' },
-  { type: 'announcement',  label: 'Announcement',  iconName: 'Megaphone' },
-  { type: 'reminder',      label: 'Reminder',      iconName: 'AlarmClock' },
-  { type: 'lesson',        label: 'Lesson',        iconName: 'BookOpen' },
-  { type: 'wrap-up',       label: 'Wrap-Up',       iconName: 'CheckCheck' },
-  { type: 'other',         label: 'Other',         iconName: 'MoreHorizontal' },
+  { type: 'reminder',      label: 'Reminder',      iconName: 'AlarmClock',    color: 'yellow' },
+  { type: 'bell-work',     label: 'Bell Work',     iconName: 'Bell',          color: 'slate' },
+  { type: 'announcement',  label: 'Announcement',  iconName: 'Megaphone',     color: 'slate' },
+  { type: 'lesson',        label: 'Lesson',        iconName: 'BookOpen',      color: 'slate' },
+  { type: 'wrap-up',       label: 'Wrap-Up',       iconName: 'CheckCheck',    color: 'slate' },
+  { type: 'other',         label: 'Other',         iconName: 'ArrowLeft',     color: 'slate' },
 ];
 
 export function getClassItemTypeConfig(type: ClassItemType): ClassItemTypeConfig {

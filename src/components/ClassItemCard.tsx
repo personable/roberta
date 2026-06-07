@@ -1,6 +1,6 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Trash2, CornerDownLeft } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { cn } from '../lib/utils';
 import { getItemTypeConfig, CLASS_ITEM_TYPE_CONFIGS, getClassItemTypeConfig } from '../lib/itemTypes';
 import ColorBox from './ColorBox';
@@ -8,12 +8,13 @@ import type { ScheduleItem, ClassSubItem, ClassItemType } from '../types';
 
 interface ClassItemCardProps {
   item: ScheduleItem;
+  onClick: () => void;
   onDelete: () => void;
   onAddSubItem: (title: string, type: ClassItemType) => void;
   onDeleteSubItem: (subItemId: string) => void;
 }
 
-export default function ClassItemCard({ item, onDelete, onAddSubItem, onDeleteSubItem }: ClassItemCardProps) {
+export default function ClassItemCard({ item, onClick, onDelete, onAddSubItem, onDeleteSubItem }: ClassItemCardProps) {
   const classConfig = getItemTypeConfig('class');
   const [selectedType, setSelectedType] = useState<ClassItemType>('bell-work');
   const [inputValue, setInputValue] = useState('');
@@ -32,20 +33,25 @@ export default function ClassItemCard({ item, onDelete, onAddSubItem, onDeleteSu
   return (
     <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
       {/* Class header */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
-        <ColorBox size={32} color={classConfig.color} iconName={classConfig.iconName} />
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-            {classConfig.label}
-          </p>
-          <p className="font-display font-bold text-md text-slate-800 truncate">{item.title}</p>
-        </div>
+      <div className="flex items-center border-b border-slate-100">
+        <button
+          onClick={onClick}
+          className="flex-1 flex items-center gap-3 px-4 py-3 text-left min-w-0"
+        >
+          <ColorBox size={32} color={classConfig.color} iconName={classConfig.iconName} />
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+              {classConfig.label}
+            </p>
+            <p className="font-display font-bold text-md text-slate-800 truncate">{item.title}</p>
+          </div>
+        </button>
         <button
           onClick={onDelete}
           aria-label={`Delete "${item.title}"`}
-          className="text-slate-600 hover:text-slate-800 transition-colors p-1"
+          className="px-4 text-slate-600 hover:text-slate-800 transition-colors self-stretch flex items-center"
         >
-          <Trash2 size={16} />
+          <Trash2 size={18} />
         </button>
       </div>
 
@@ -73,7 +79,7 @@ export default function ClassItemCard({ item, onDelete, onAddSubItem, onDeleteSu
               aria-label={`Class item type: ${currentTypeConfig.label}. Click to change`}
               className="shrink-0 transition-opacity hover:opacity-75 focus:outline-none"
             >
-              <ColorBox size={32} color="white" iconName={currentTypeConfig.iconName} />
+              <ColorBox size={32} color={currentTypeConfig.color} iconName={currentTypeConfig.iconName} />
             </button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Portal>
@@ -83,19 +89,21 @@ export default function ClassItemCard({ item, onDelete, onAddSubItem, onDeleteSu
               sideOffset={6}
               className="bg-white border border-slate-100 rounded-xl shadow-lg py-2 min-w-[190px] z-50 origin-bottom-left animate-in fade-in-0 zoom-in-95 duration-100"
             >
-              {CLASS_ITEM_TYPE_CONFIGS.map((c) => (
-                <DropdownMenu.Item
-                  key={c.type}
-                  onSelect={() => setSelectedType(c.type)}
-                  className={cn(
-                    'flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 cursor-default select-none outline-none',
-                    'data-[highlighted]:bg-slate-50',
-                    selectedType === c.type && 'font-medium',
-                  )}
-                >
-                  <ColorBox size={28} color="white" iconName={c.iconName} />
-                  {c.label}
-                </DropdownMenu.Item>
+              {CLASS_ITEM_TYPE_CONFIGS.map((c, idx) => (
+                <React.Fragment key={c.type}>
+                  <DropdownMenu.Item
+                    onSelect={() => setSelectedType(c.type)}
+                    className={cn(
+                      'flex items-center gap-2.5 px-3 py-1.5 text-sm text-slate-700 cursor-default select-none outline-none',
+                      'data-[highlighted]:bg-slate-50',
+                      selectedType === c.type && 'font-medium',
+                    )}
+                  >
+                    <ColorBox size={28} color={c.color} iconName={c.iconName} />
+                    {c.label}
+                  </DropdownMenu.Item>
+                  {idx === 0 && <DropdownMenu.Separator className="h-px bg-slate-100 my-1" />}
+                </React.Fragment>
               ))}
             </DropdownMenu.Content>
           </DropdownMenu.Portal>
@@ -128,7 +136,7 @@ function SubItemRow({ subItem, onDelete }: { subItem: ClassSubItem; onDelete: ()
   const config = getClassItemTypeConfig(subItem.type);
   return (
     <div className="flex items-center gap-3 pr-4 pl-8 py-3 group">
-      <ColorBox size={32} color="white" iconName={config.iconName} className="shrink-0" />
+      <ColorBox size={32} color={config.color} iconName={config.iconName} className="shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-0.5">
           {config.label}
@@ -140,7 +148,7 @@ function SubItemRow({ subItem, onDelete }: { subItem: ClassSubItem; onDelete: ()
         aria-label={`Delete "${subItem.title}"`}
         className="opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 text-slate-600 hover:text-slate-800 transition-all p-1"
       >
-        <Trash2 size={16} />
+        <Trash2 size={18} />
       </button>
     </div>
   );

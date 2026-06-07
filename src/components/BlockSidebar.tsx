@@ -3,23 +3,23 @@ import type { Block } from '../types';
 
 interface BlockSidebarProps {
   blocks: Block[];
-  selectedBlockId: string;
-  onSelectBlock: (blockId: string) => void;
+  activeBlockId: string;
+  onScrollToBlock: (blockId: string) => void;
 }
 
 export default function BlockSidebar({
   blocks,
-  selectedBlockId,
-  onSelectBlock,
+  activeBlockId,
+  onScrollToBlock,
 }: BlockSidebarProps) {
   return (
     <div className="w-[260px] shrink-0 border-r border-slate-200 overflow-y-auto bg-white">
       {blocks.map((block) => {
-        const isSelected = block.id === selectedBlockId;
+        const isSelected = block.id === activeBlockId;
         return (
           <button
             key={block.id}
-            onClick={() => onSelectBlock(block.id)}
+            onClick={() => onScrollToBlock(block.id)}
             className={cn(
               'w-full text-left px-5 py-5 border-b border-slate-100 transition-colors',
               isSelected

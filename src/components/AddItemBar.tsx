@@ -1,6 +1,6 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { CornerDownLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { cn } from '../lib/utils';
 import { ITEM_TYPE_CONFIGS } from '../lib/itemTypes';
 import ColorBox from './ColorBox';
@@ -8,12 +8,14 @@ import type { ItemType } from '../types';
 
 interface AddItemBarProps {
   onAdd: (title: string, type: ItemType) => void;
+  activeBlockName: string;
 }
 
-export default function AddItemBar({ onAdd }: AddItemBarProps) {
+export default function AddItemBar({ onAdd, activeBlockName }: AddItemBarProps) {
   const [selectedType, setSelectedType] = useState<ItemType>('reminder');
   const [inputValue, setInputValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const currentConfig = ITEM_TYPE_CONFIGS.find((c) => c.type === selectedType)!;
 
@@ -26,7 +28,7 @@ export default function AddItemBar({ onAdd }: AddItemBarProps) {
 
   return (
     <div className={cn(
-      'relative h-20 flex items-center gap-4 px-6 bg-white shrink-0 border-b-2 border-transparent',
+      'relative h-20 flex items-center gap-4 px-6 bg-white shrink-0 border-l-transparent border-r-slate-400 border-t border-t-slate-200',
       isFocused && 'border-slate-600',
     )}>
       {/* Type picker */}
@@ -46,6 +48,10 @@ export default function AddItemBar({ onAdd }: AddItemBarProps) {
             align="start"
             sideOffset={8}
             className="bg-white border border-slate-100 rounded-xl shadow-lg py-2 min-w-[200px] z-50 origin-bottom-left animate-in fade-in-0 zoom-in-95 duration-100"
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              inputRef.current?.focus();
+            }}
           >
             {ITEM_TYPE_CONFIGS.map((c) => (
               <DropdownMenu.Item
@@ -67,14 +73,16 @@ export default function AddItemBar({ onAdd }: AddItemBarProps) {
 
       {/* Text input */}
       <input
+        ref={inputRef}
         type="text"
+        autoFocus
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
-        placeholder="Start typing to add..."
-        className="flex-1 text-lg text-slate-900 placeholder-slate-400 font-display font-light bg-transparent focus:outline-none"
+        placeholder={`Add item to ${activeBlockName}…`}
+        className="flex-1 text-lg text-slate-900 placeholder-slate-600 font-display font-light bg-transparent focus:outline-none"
       />
 
       {/* Submit button */}
