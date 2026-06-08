@@ -16,6 +16,8 @@ interface AllBlocksContentProps {
   onActiveBlockChange: (blockId: string) => void;
   onItemClick: (item: ScheduleItem, blockId: string) => void;
   onDeleteItem: (blockId: string, itemId: string) => void;
+  onMoveItem: (fromBlockId: string, toBlockId: string, itemId: string) => void;
+  onToggleComplete: (blockId: string, itemId: string) => void;
   onDeleteAll: (blockId: string) => void;
   onAddClassSubItem: (blockId: string, classItemId: string, title: string, type: ClassItemType) => void;
   onDeleteClassSubItem: (blockId: string, classItemId: string, subItemId: string) => void;
@@ -23,7 +25,7 @@ interface AllBlocksContentProps {
 
 const AllBlocksContent = forwardRef<AllBlocksContentHandle, AllBlocksContentProps>(
   function AllBlocksContent(
-    { blocks, allItems, dayKey, activeBlockId, onActiveBlockChange, onItemClick, onDeleteItem, onDeleteAll, onAddClassSubItem, onDeleteClassSubItem },
+    { blocks, allItems, dayKey, activeBlockId, onActiveBlockChange, onItemClick, onDeleteItem, onMoveItem, onToggleComplete, onDeleteAll, onAddClassSubItem, onDeleteClassSubItem },
     ref,
   ) {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -85,17 +87,20 @@ const AllBlocksContent = forwardRef<AllBlocksContentHandle, AllBlocksContentProp
             }}
             className={cn(
               'snap-start',
-              idx < blocks.length - 1 && 'border-b border-slate-200',
+              idx < blocks.length - 1 && 'border-b border-slate-100',
             )}
           >
             <BlockContent
               key={`${dayKey}-${block.id}`}
               block={block}
+              blocks={blocks}
               isActive={block.id === activeBlockId}
               items={allItems[block.id] ?? []}
               onItemClick={(item) => onItemClick(item, block.id)}
               onDeleteAll={() => onDeleteAll(block.id)}
               onDeleteItem={(id) => onDeleteItem(block.id, id)}
+              onMoveItem={(toBlockId, itemId) => onMoveItem(block.id, toBlockId, itemId)}
+              onToggleComplete={(itemId) => onToggleComplete(block.id, itemId)}
               onAddClassSubItem={(classItemId, title, type) =>
                 onAddClassSubItem(block.id, classItemId, title, type)
               }

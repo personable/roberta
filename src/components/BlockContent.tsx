@@ -6,27 +6,37 @@ import { cn } from '../lib/utils';
 import { getItemTypeConfig } from '../lib/itemTypes';
 import ColorBox from './ColorBox';
 import ClassItemCard from './ClassItemCard';
+import ItemActionMenu from './ItemActionMenu';
+import CompleteButton from './CompleteButton';
 import type { Block, ScheduleItem, ClassItemType } from '../types';
 
 interface BlockContentProps {
   block: Block;
+  blocks: Block[];
   items: ScheduleItem[];
   isActive?: boolean;
   onItemClick: (item: ScheduleItem) => void;
   onDeleteAll: () => void;
   onDeleteItem: (id: string) => void;
+  onMoveItem: (toBlockId: string, itemId: string) => void;
+  onToggleComplete: (itemId: string) => void;
   onAddClassSubItem: (classItemId: string, title: string, type: ClassItemType) => void;
   onDeleteClassSubItem: (classItemId: string, subItemId: string) => void;
 }
 
-export default function BlockContent({ block, items, isActive, onItemClick, onDeleteAll, onDeleteItem, onAddClassSubItem, onDeleteClassSubItem }: BlockContentProps) {
+export default function BlockContent({ block, blocks, items, isActive, onItemClick, onDeleteAll, onDeleteItem, onMoveItem, onToggleComplete, onAddClassSubItem, onDeleteClassSubItem }: BlockContentProps) {
   // Stays false during the first render so pre-existing items skip the entrance animation.
   // Flips to true after mount so any subsequently added item animates in normally.
   const hasMounted = useRef(false);
   useEffect(() => { hasMounted.current = true; }, []);
 
   return (
-    <div className="p-8">
+    <div
+      className={cn(
+        'p-7',
+        isActive ? 'bg-slate-50' : 'bg-white',
+      )}
+    >
       {/* Block heading */}
       <div className="flex items-baseline justify-between mb-6">
         <div
@@ -36,11 +46,11 @@ export default function BlockContent({ block, items, isActive, onItemClick, onDe
           )}
         >
           <h2 className={cn(
-            'font-display text-3xl font-extrabold ',
-            isActive ? 'color-slate-800' : 'color-slate-600',
+            'font-display text-2xl text-slate-800',
+            isActive ? 'font-extrabold' : 'font-bold'
           )}>{block.name}</h2>
           {block.time && (
-            <span className="text-sm text-slate-400">{block.time}</span>
+            <span className="text-sm text-slate-500">{block.time}</span>
           )}
         </div>
         {items.length > 0 && (
@@ -53,12 +63,13 @@ export default function BlockContent({ block, items, isActive, onItemClick, onDe
 
       {/* Items */}
       {items.length === 0 ? (
-        <p className="text-sm text-slate-400 italic">No items yet. Add one below.</p>
+        <p className="text-sm text-slate-500 italic text-center">No items yet.</p>
       ) : (
         <div className="flex flex-col gap-2">
           <AnimatePresence>
           {items.map((item) => {
             const config = getItemTypeConfig(item.type);
+            const completed = item.completed ?? false;
             return (
               <motion.div
                 key={item.id}
@@ -71,8 +82,12 @@ export default function BlockContent({ block, items, isActive, onItemClick, onDe
                 {item.type === 'class' ? (
                   <ClassItemCard
                     item={item}
+                    blocks={blocks}
+                    currentBlockId={block.id}
                     onClick={() => onItemClick(item)}
                     onDelete={() => onDeleteItem(item.id)}
+                    onMove={(toBlockId) => onMoveItem(toBlockId, item.id)}
+                    onToggleComplete={() => onToggleComplete(item.id)}
                     onAddSubItem={(title, type) => onAddClassSubItem(item.id, title, type)}
                     onDeleteSubItem={(subItemId) => onDeleteClassSubItem(item.id, subItemId)}
                   />
@@ -86,25 +101,41 @@ export default function BlockContent({ block, items, isActive, onItemClick, onDe
                       onClick={() => onItemClick(item)}
                       className="flex-1 flex items-start gap-4 p-4 text-left min-w-0 rounded-l-xl"
                     >
-                      <ColorBox size={32} color={config.color} iconName={config.iconName} className="mt-1" />
+                      <ColorBox size={32} color={config.color} iconName={config.iconName} className={cn('mt-0.5 transition-opacity', completed && 'opacity-40')} />
                       <div className="min-w-0">
                         <h3 className="text-[10px] font-semibold uppercase tracking-widest mb-0.5 text-slate-400">
                           {config.label}
                         </h3>
-                        <p className="font-display font-bold text-md text-slate-800 truncate">{item.title}</p>
+                        <p className={cn(
+                          'font-display font-bold text-md truncate transition-colors',
+                          completed ? 'line-through text-slate-400' : 'text-slate-800',
+                        )}>
+                          {item.title}
+                        </p>
                         {item.description && (
-                          <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">{item.description}</p>
+                          <p className={cn(
+                            'text-xs mt-0.5 line-clamp-2 transition-colors',
+                            completed ? 'text-slate-400' : 'text-slate-600',
+                          )}>
+                            {item.description}
+                          </p>
                         )}
                       </div>
                     </button>
-                    {/* Delete — sibling button, never nested */}
-                    <button
-                      onClick={() => onDeleteItem(item.id)}
-                      aria-label={`Delete "${item.title}"`}
-                      className="flex items-center px-4 text-slate-600 hover:text-slate-800 transition-all rounded-r-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+                    {/* Complete + action menu — siblings, never nested */}
+                    <CompleteButton
+                      completed={completed}
+                      onToggle={() => onToggleComplete(item.id)}
+                      className="px-3 self-stretch transition-all opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
+                    <ItemActionMenu
+                      blocks={blocks}
+                      currentBlockId={block.id}
+                      itemTitle={item.title}
+                      onMove={(toBlockId) => onMoveItem(toBlockId, item.id)}
+                      onDelete={() => onDeleteItem(item.id)}
+                      triggerClassName="px-3 rounded-r-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+                    />
                   </div>
                 )}
               </motion.div>

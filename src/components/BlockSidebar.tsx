@@ -13,7 +13,7 @@ export default function BlockSidebar({
   onScrollToBlock,
 }: BlockSidebarProps) {
   return (
-    <div className="w-[260px] shrink-0 border-r border-slate-200 overflow-y-auto bg-white">
+    <div className="hidden min-[1000px]:block w-[260px] shrink-0 border-r border-slate-200 overflow-y-auto bg-white">
       {blocks.map((block) => {
         const isSelected = block.id === activeBlockId;
         return (
@@ -21,27 +21,22 @@ export default function BlockSidebar({
             key={block.id}
             onClick={() => onScrollToBlock(block.id)}
             className={cn(
-              'w-full text-left px-5 py-5 border-b border-slate-100 transition-colors',
+              'w-full text-left py-5 px-4 transition-all ',
               isSelected
-                ? 'bg-slate-800 text-white'
-                : 'hover:bg-slate-50 text-slate-800',
+                ? 'bg-slate-800'
+                : 'hover:bg-slate-50',
             )}
           >
             <div
               className={cn(
-                'text-sm text-md font-semibold leading-tight font-display',
-                isSelected ? 'text-white' : 'text-slate-800',
+                'text-m font-semibold leading-tight font-display',
+                isSelected ? 'text-white' : 'text-slate-800'
               )}
             >
               {block.name}
             </div>
             {block.time && (
-              <div
-                className={cn(
-                  'text-xs mt-0.5 leading-tight',
-                  isSelected ? 'text-slate-400' : 'text-slate-400',
-                )}
-              >
+              <div className="text-xs mt-0.5 leading-tight text-slate-400">
                 {block.time}
               </div>
             )}

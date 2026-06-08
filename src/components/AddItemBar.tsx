@@ -81,7 +81,7 @@ export default function AddItemBar({ onAdd, activeBlockName }: AddItemBarProps) 
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
-        placeholder={`Add item to ${activeBlockName}…`}
+        placeholder={`Add item to ${activeBlockName} ...`}
         className="flex-1 text-lg text-slate-900 placeholder-slate-600 font-display font-light bg-transparent focus:outline-none"
       />
 

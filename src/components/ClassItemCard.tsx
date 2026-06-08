@@ -4,17 +4,23 @@ import React, { useState } from 'react';
 import { cn } from '../lib/utils';
 import { getItemTypeConfig, CLASS_ITEM_TYPE_CONFIGS, getClassItemTypeConfig } from '../lib/itemTypes';
 import ColorBox from './ColorBox';
-import type { ScheduleItem, ClassSubItem, ClassItemType } from '../types';
+import ItemActionMenu from './ItemActionMenu';
+import CompleteButton from './CompleteButton';
+import type { Block, ScheduleItem, ClassSubItem, ClassItemType } from '../types';
 
 interface ClassItemCardProps {
   item: ScheduleItem;
+  blocks: Block[];
+  currentBlockId: string;
   onClick: () => void;
   onDelete: () => void;
+  onMove: (toBlockId: string) => void;
+  onToggleComplete: () => void;
   onAddSubItem: (title: string, type: ClassItemType) => void;
   onDeleteSubItem: (subItemId: string) => void;
 }
 
-export default function ClassItemCard({ item, onClick, onDelete, onAddSubItem, onDeleteSubItem }: ClassItemCardProps) {
+export default function ClassItemCard({ item, blocks, currentBlockId, onClick, onDelete, onMove, onToggleComplete, onAddSubItem, onDeleteSubItem }: ClassItemCardProps) {
   const classConfig = getItemTypeConfig('class');
   const [selectedType, setSelectedType] = useState<ClassItemType>('bell-work');
   const [inputValue, setInputValue] = useState('');
@@ -22,6 +28,7 @@ export default function ClassItemCard({ item, onClick, onDelete, onAddSubItem, o
 
   const currentTypeConfig = getClassItemTypeConfig(selectedType);
   const subItems = item.classItems ?? [];
+  const completed = item.completed ?? false;
 
   function handleSubmit() {
     const trimmed = inputValue.trim();
@@ -31,28 +38,47 @@ export default function ClassItemCard({ item, onClick, onDelete, onAddSubItem, o
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+    <div className="group/card rounded-xl border border-slate-200 bg-white overflow-hidden">
       {/* Class header */}
       <div className="flex items-center border-b border-slate-100">
         <button
           onClick={onClick}
-          className="flex-1 flex items-center gap-3 px-4 py-3 text-left min-w-0"
+          className="flex-1 flex items-start gap-3 px-4 py-3 text-left min-w-0"
         >
-          <ColorBox size={32} color={classConfig.color} iconName={classConfig.iconName} />
+          <ColorBox size={32} color={classConfig.color} iconName={classConfig.iconName} className={cn('mt-0.5 transition-opacity', completed && 'opacity-40')} />
           <div className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
               {classConfig.label}
             </p>
-            <p className="font-display font-bold text-md text-slate-800 truncate">{item.title}</p>
+            <p className={cn(
+              'font-display font-bold text-md truncate transition-colors',
+              completed ? 'line-through text-slate-400' : 'text-slate-800',
+            )}>
+              {item.title}
+            </p>
+            {item.description && (
+              <p className={cn(
+                'text-xs mt-0.5 line-clamp-2 transition-colors',
+                completed ? 'text-slate-400' : 'text-slate-600',
+              )}>
+                {item.description}
+              </p>
+            )}
           </div>
         </button>
-        <button
-          onClick={onDelete}
-          aria-label={`Delete "${item.title}"`}
-          className="px-4 text-slate-600 hover:text-slate-800 transition-colors self-stretch flex items-center"
-        >
-          <Trash2 size={18} />
-        </button>
+        <CompleteButton
+          completed={completed}
+          onToggle={onToggleComplete}
+          className="px-3 self-stretch transition-all opacity-0 group-hover/card:opacity-100 group-focus-within/card:opacity-100"
+        />
+        <ItemActionMenu
+          blocks={blocks}
+          currentBlockId={currentBlockId}
+          itemTitle={item.title}
+          onMove={onMove}
+          onDelete={onDelete}
+          triggerClassName="px-3 self-stretch opacity-0 group-hover/card:opacity-100 focus:opacity-100"
+        />
       </div>
 
       {/* Sub-items */}

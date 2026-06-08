@@ -14,6 +14,7 @@ export interface ScheduleItem {
   title: string;
   description?: string;
   classItems?: ClassSubItem[];
+  completed?: boolean;
 }
 
 export interface Block {

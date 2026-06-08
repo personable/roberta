@@ -123,6 +123,25 @@ export default function App() {
     setRenderToken((t) => t + 1);
   }
 
+  function handleToggleComplete(blockId: string, itemId: string) {
+    const blockItems = getItems(weekStart, selectedDayIndex, blockId);
+    const next = blockItems.map((it) =>
+      it.id === itemId ? { ...it, completed: !it.completed } : it,
+    );
+    saveItems(weekStart, selectedDayIndex, blockId, next);
+    setRenderToken((t) => t + 1);
+  }
+
+  function handleMoveItem(fromBlockId: string, toBlockId: string, itemId: string) {
+    const fromItems = getItems(weekStart, selectedDayIndex, fromBlockId);
+    const item = fromItems.find((it) => it.id === itemId);
+    if (!item) return;
+    saveItems(weekStart, selectedDayIndex, fromBlockId, fromItems.filter((it) => it.id !== itemId));
+    const toItems = getItems(weekStart, selectedDayIndex, toBlockId);
+    saveItems(weekStart, selectedDayIndex, toBlockId, [...toItems, item]);
+    setRenderToken((t) => t + 1);
+  }
+
   function handleDeleteAll(blockId: string) {
     saveItems(weekStart, selectedDayIndex, blockId, []);
     if (drawerItem?.blockId === blockId) {
@@ -159,8 +178,12 @@ export default function App() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-slate-50">
-      <AppHeader />
+    <div className="h-screen flex flex-col overflow-hidden bg-slate-50 min-w-[768px]">
+      <AppHeader
+        weekStart={weekStart}
+        onPrevWeek={() => setWeekOffset((o) => o - 1)}
+        onNextWeek={() => setWeekOffset((o) => o + 1)}
+      />
 
       <DayHeader
         weekStart={weekStart}
@@ -192,6 +215,8 @@ export default function App() {
             onItemClick={handleItemClick}
             onDeleteAll={handleDeleteAll}
             onDeleteItem={handleDeleteItem}
+            onMoveItem={handleMoveItem}
+            onToggleComplete={handleToggleComplete}
             onAddClassSubItem={handleAddClassSubItem}
             onDeleteClassSubItem={handleDeleteClassSubItem}
           />
