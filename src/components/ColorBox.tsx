@@ -23,7 +23,7 @@ const COLOR_VALUES: Record<BoxColor, { bg: string; border: string }> = {
   black:  { bg: '#1F1D19', border: '#4A4640' },
 };
 
-const ICON_COLOR_DARK = '#33302B';  // slate-800, for light backgrounds
+const ICON_COLOR_DARK = '#1F1D19';  // slate-800, for light backgrounds
 const ICON_COLOR_LIGHT = '#EDE9E0'; // slate-100, for dark backgrounds
 const DARK_BACKGROUNDS: BoxColor[] = ['black'];
 

@@ -18,7 +18,13 @@ export default function AppHeader({ weekStart, onPrevWeek, onNextWeek }: AppHead
         className="gap-4 min-[1000px]:hidden"
       />
       <button
-        onClick={() => console.log('settings')}
+        onClick={() => alert(
+          `Settings config where users could:
+           - Set up the dates of their semester and the default items in each block during the semester
+           - Configure their own item types for Blocks and Classes
+           - Configure their own day labels (Red Day, etc.)
+          `
+        )}
         aria-label="Settings"
         className="w-8 h-8 flex items-center justify-center rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
       >

@@ -60,6 +60,14 @@ export const ITEM_TYPE_CONFIGS: ItemTypeConfig[] = [
     cardBg: 'bg-orange-50',
     borderColor: 'border-orange-400',
   },
+  {
+    type: 'supervise',
+    label: 'Supervise',
+    color: 'red',
+    iconName: 'School',
+    cardBg: 'bg-red-50',
+    borderColor: 'border-red-400',
+  },
 ];
 
 export function getItemTypeConfig(type: ItemType): ItemTypeConfig {
@@ -79,7 +87,7 @@ export const CLASS_ITEM_TYPE_CONFIGS: ClassItemTypeConfig[] = [
   { type: 'announcement',  label: 'Announcement',  iconName: 'Megaphone',     color: 'slate' },
   { type: 'lesson',        label: 'Lesson',        iconName: 'BookOpen',      color: 'slate' },
   { type: 'wrap-up',       label: 'Wrap-Up',       iconName: 'CheckCheck',    color: 'slate' },
-  { type: 'other',         label: 'Other',         iconName: 'ArrowLeft',     color: 'slate' },
+  { type: 'other',         label: 'Other',         iconName: 'ArrowRight',    color: 'slate' },
 ];
 
 export function getClassItemTypeConfig(type: ClassItemType): ClassItemTypeConfig {

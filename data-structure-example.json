@@ -1,0 +1,68 @@
+{
+  "weekStart": "2026-06-08",
+  "days": [
+    {
+      "dayIndex": 0,
+      "dayType": "red",
+      "blocks": [
+        {
+          "id": "before",
+          "name": "Before School",
+          "time": "",
+          "items": []
+        },
+        {
+          "id": "block1",
+          "name": "Block 1",
+          "time": "8:25 – 8:49",
+          "items": [
+            {
+              "id": "a1b2c3d4",
+              "type": "reminder",
+              "title": "Attendance window opens",
+              "description": "Submit by 8:40",
+              "completed": false
+            },
+            {
+              "id": "e5f6g7h8",
+              "type": "class",
+              "title": "AP English",
+              "description": "Room 214",
+              "completed": false,
+              "classItems": [
+                {
+                  "id": "i9j0k1l2",
+                  "type": "bell-work",
+                  "title": "Journal prompt on the board"
+                },
+                {
+                  "id": "m3n4o5p6",
+                  "type": "lesson",
+                  "title": "Thesis statement workshop"
+                },
+                {
+                  "id": "q7r8s9t0",
+                  "type": "wrap-up",
+                  "title": "Exit ticket"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "block2",
+          "name": "Block 2",
+          "time": "8:50 – 9:38",
+          "items": [
+            {
+              "id": "u1v2w3x4",
+              "type": "prep",
+              "title": "Copy lab handouts",
+              "completed": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
