@@ -60,6 +60,17 @@ export default function ItemDrawer({
     onClose();
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (isCreateMode) {
+      handleAddToAll();
+    } else {
+      handleSave();
+      onClose();
+    }
+  }
+
   function handleOpenChange(o: boolean) {
     if (!o) {
       if (!isCreateMode) handleSave();
@@ -113,7 +124,7 @@ export default function ItemDrawer({
                     {/* Type selector */}
                     <div>
                       <label className="text-xs font-medium text-slate-500 uppercase tracking-wide block mb-2">
-                        Type
+                        {type}
                       </label>
                       <div className="flex gap-2 flex-wrap">
                         {ITEM_TYPE_CONFIGS.map((c) => (
@@ -122,7 +133,7 @@ export default function ItemDrawer({
                             onClick={() => setType(c.type)}
                             title={c.label}
                             className={cn(
-                              'transition-all rounded-xl focus:outline-none',
+                              'transition-all rounded-lg focus:outline-none',
                               type === c.type ? 'scale-110' : 'opacity-50 hover:opacity-100',
                             )}
                           >
@@ -142,6 +153,7 @@ export default function ItemDrawer({
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         onBlur={isCreateMode ? undefined : handleSave}
+                        onKeyDown={handleKeyDown}
                         className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300"
                         placeholder="Item title"
                         autoFocus={isCreateMode}
@@ -157,6 +169,7 @@ export default function ItemDrawer({
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         onBlur={isCreateMode ? undefined : handleSave}
+                        onKeyDown={handleKeyDown}
                         rows={4}
                         className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300 resize-none"
                         placeholder="Optional notes..."
@@ -173,7 +186,10 @@ export default function ItemDrawer({
 
                   {/* Footer — edit mode only */}
                   {!isCreateMode && (
-                    <div className="px-4 py-3 border-t border-slate-100">
+                    <div className="px-4 py-3 border-t border-slate-100 flex flex-col gap-3">
+                      <Button onClick={() => { handleSave(); onClose(); }}>
+                        Done
+                      </Button>
                       <button
                         onClick={handleDelete}
                         className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm text-slate-600 hover:bg-slate-50 transition-colors"

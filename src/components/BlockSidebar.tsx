@@ -21,7 +21,7 @@ export default function BlockSidebar({
             key={block.id}
             onClick={() => onScrollToBlock(block.id)}
             className={cn(
-              'w-full text-left py-5 px-4 transition-all ',
+              'w-full text-left py-4 px-4 transition-all border-b border-slate-100',
               isSelected
                 ? 'bg-slate-800'
                 : 'hover:bg-slate-50',

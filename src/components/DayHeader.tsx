@@ -98,7 +98,7 @@ export default function DayHeader({
               <DropdownMenu.Trigger asChild>
                 <button
                   aria-label="Day options"
-                  className="px-3 flex items-center text-slate-500 hover:text-slate-800 transition-colors focus:outline-none"
+                  className="px-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors focus:outline-none"
                 >
                   <MoreHorizontal size={16} />
                 </button>
@@ -138,8 +138,8 @@ export default function DayHeader({
               )}
             >
               <span className={cn(
-                'font-display text-lg font-semibold leading-none text-left',
-                isSelected ? 'text-white' : 'text-slate-900',
+                'flex-1 font-display text-md font-semibold leading-none text-left',
+                isSelected ? 'text-white' : 'text-slate-800',
               )}>
                 {DAY_NAMES[i]}
               </span>

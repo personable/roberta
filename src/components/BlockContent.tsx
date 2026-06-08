@@ -34,7 +34,7 @@ export default function BlockContent({ block, blocks, items, isActive, onItemCli
     <div
       className={cn(
         'p-7',
-        isActive ? 'bg-slate-50' : 'bg-white',
+        isActive ? 'bg-slate-50' : 'bg-white/50',
       )}
     >
       {/* Block heading */}
@@ -107,7 +107,7 @@ export default function BlockContent({ block, blocks, items, isActive, onItemCli
                           {config.label}
                         </h3>
                         <p className={cn(
-                          'font-display font-bold text-md truncate transition-colors',
+                          'font-display font-semibold text-md truncate transition-colors',
                           completed ? 'line-through text-slate-400' : 'text-slate-800',
                         )}>
                           {item.title}

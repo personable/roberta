@@ -58,7 +58,7 @@ export default function ClassItemCard({ item, blocks, currentBlockId, onClick, o
             </p>
             {item.description && (
               <p className={cn(
-                'text-xs mt-0.5 line-clamp-2 transition-colors',
+                'text-xs mt-0.5 line-clamp-2 transition-colors whitespace-pre-wrap',
                 completed ? 'text-slate-400' : 'text-slate-600',
               )}>
                 {item.description}
